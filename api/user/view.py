@@ -2,87 +2,98 @@
 # project/user/views.py
 
 import datetime
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, render_template, flash, current_app, redirect, url_for
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash
+from sqlalchemy.exc import IntegrityError
 
 from api.models import User
 from api import db
 from api.response_code import RET
-from .forms import LoginForm, RegisterForm
-from api.digit_code_token import generate_confirmation_token_and_send_email, confirm_token
+from .forms import LoginForm, RegisterForm, ConfirmForm
+from api.user.utils import generate_confirmation_token_and_send_email, confirm_token
 
 user_blueprint = Blueprint('user', __name__, )
 
 
-@user_blueprint.route('/hello', methods=['GET'])
+@user_blueprint.route('/hello')
 def hello():
     return "hello world"
 
 
-@user_blueprint.route('/register', methods=['GET', 'POST'])
-def register():
+@user_blueprint.route('/', methods=['GET', 'POST'])
+def home():
     form = RegisterForm(request.form)
     if form.validate_on_submit():
-        user = User(
-                email=form.email.data,
-                password=form.password.data,
-                confirmed=False
-        )
-        # register user into database
-        db.session.add(user)
-        db.session.commit()
-
-        # send email confirmation
-        result = generate_confirmation_token_and_send_email(user)
-
-        if result == 1:
-            return jsonify(errno=RET.OK, errmsg="validation email send with success")
-        else:
-            return jsonify(errno=RET.THIRDERR, errmsg="send email error")
-
-
-@user_blueprint.route('/confirm/<digit_code>')
-@login_required
-def confirm_email(digit_code):
-    if current_user.confirmed:
-        return jsonify(errno=RET.REQERR, errmsg="User already confirmed.")
-    result = confirm_token(current_user.id, digit_code)
-    user = User.query.filter_by(email=current_user.email).first_or_404()
-    if result:
-        user.confirmed = True
-        user.confirmed_on = datetime.datetime.now()
-        db.session.add(user)
-        db.session.commit()
-    else:
-        return jsonify(errno=RET.REQERR, errmsg="The digit code is invalid or has expired.")
-    return jsonify(errno=RET.OK, errmsg="Account validated with success")
-
-
-@user_blueprint.route('/resend')
-@login_required
-def resend_confirmation():
-    result = generate_confirmation_token_and_send_email(current_user)
-    if result == 1:
-        return jsonify(errno=RET.OK, errmsg="validation email send with success")
-    else:
-        return jsonify(errno=RET.THIRDERR, errmsg="send email error")
-
-
-@user_blueprint.route('/login', methods=['GET', 'POST'])
-def login():
-    form = LoginForm(request.form)
-    if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        if user and check_password_hash(user.password, request.form['password']):
+        try:
+            user = User(
+                    email=form.email.data,
+                    password=form.password.data,
+                    confirmed=False
+            )
+            # register user into database
+            db.session.add(user)
+            db.session.commit()
+            # send email confirmation
+            result = generate_confirmation_token_and_send_email(user)
             login_user(user)
-            return jsonify(errno=RET.OK, errmsg="login with success")
+            if result == 1:
+                user = User.query.filter_by(id=user.id).first()
+                user.email_sent = True
+                user.confirmed_on = datetime.datetime.now()
+                db.session.commit()
+                current_app.logger.info("send confirmation mail to %s, at %s".format(
+                        user.email,
+                        user.confirmed_on.strftime("%Y-%m-%d %H:%M:%S")
+                ))
+                flash('A confirmation email has sent to you.', 'success')
+                return redirect(url_for('user.confirm_email'))
+            else:
+                current_app.logger.error("send confirmation mail occurred a problem to %s, at %s".format(
+                        user.email,
+                        user.confirmed_on.strftime("%Y-%m-%d %H:%M:%S")
+                ))
+                flash('Confirmation email occurred a problem.', 'danger')
+        except IntegrityError:
+            db.session.rollback()
+            flash('Registration occurred a problem.', 'danger')
+
+    users = User.query.all()
+    return render_template('home.html', form=form, users=users)
+
+
+@user_blueprint.route('/confirm/', methods=['GET', 'POST'])
+@login_required
+def confirm_email():
+    form = ConfirmForm(request.form)
+    if form.validate_on_submit():
+        if current_user.confirmed:
+            return jsonify(errno=RET.REQERR, errmsg="User already confirmed.")
+        result = confirm_token(current_user.id, form.digit_code.data)
+        user = User.query.filter_by(email=current_user.email).first_or_404()
+        if result:
+            user.confirmed = True
+            user.confirmed_on = datetime.datetime.now()
+            db.session.add(user)
+            db.session.commit()
+            flash('Your account has been confirmed', 'success')
+            return redirect(url_for('user.confirm_success'))
         else:
-            return jsonify(errno=RET.PWDERR, errmsg="user mail or password is incorrect")
+            flash('The digit code is invalid or has expired.', 'danger')
+
+    return render_template('confirmation.html', form=form, current_user=current_user)
+
+
+@user_blueprint.route('/confirm_success/')
+@login_required
+def confirm_success():
+    users = User.query.all()
+    return render_template('congratulation.html', users=users, current_user=current_user)
 
 
 @user_blueprint.route('/logout')
 @login_required
 def logout():
     logout_user()
-    return jsonify(errno=RET.OK, errmsg="logout with success")
+    flash('You were logged out.', 'success')
+    return redirect(url_for('user.home'))

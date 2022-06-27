@@ -34,7 +34,7 @@ class DevelopmentConfig(Config):
 
 # prod env
 class ProductionConfig(Config):
-    DEBUG = False
+    DEBUG = True
 
 
 config_map = {

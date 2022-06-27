@@ -20,15 +20,29 @@ class User(BaseModel, db.Model):
     email = db.Column(db.String(128), nullable=False)
     confirmed = db.Column(db.Boolean, nullable=False, default=False)
     confirmed_on = db.Column(db.DateTime, nullable=True)
+    email_sent = db.Column(db.Boolean, default=False, nullable=False)
 
-    def __init__(self, email, password, confirmed, confirmed_on=None):
+    def __init__(self, email, password, confirmed, confirmed_on=None, email_sent=None):
         self.email = email
         self.password_hash = generate_password_hash(password)
         self.registered_on = datetime.now()
         self.confirmed = confirmed
         self.confirmed_on = confirmed_on
+        self.email_sent = email_sent
 
     @property
     def password(self):
         """do not allow to read the password attribute"""
         raise AttributeError("not allow to read password")
+
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        return True
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return self.id

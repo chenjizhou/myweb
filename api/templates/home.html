@@ -1,0 +1,88 @@
+{% extends '_base.html' %}
+{% from 'bootstrap/form.html' import render_form %}
+{% block content %}
+
+  <header class="content-header">
+    <h1>Registration</h1>
+    <hr><br>
+  </header>
+
+  <div class="col-sm-6">
+    <form class="form-signin" role="form" method="post" action="">
+      {{ form.csrf_token }}
+      {{ form.email(placeholder="email") }}
+        <span class="error">
+          {% if form.email.errors %}
+            {% for error in form.email.errors %}
+              {{ error }}
+            {% endfor %}
+          {% endif %}
+        </span>
+      </p>
+      <p>
+      {{ form.password(placeholder="password") }}
+        <span class="error">
+          {% if form.password.errors %}
+            {% for error in form.password.errors %}
+              {{ error }}
+            {% endfor %}
+          {% endif %}
+        </span>
+      </p>
+      <p>
+      {{ form.confirm(placeholder="confirm") }}
+        <span class="error">
+          {% if form.confirm.errors %}
+            {% for error in form.confirm.errors %}
+              {{ error }}
+            {% endfor %}
+          {% endif %}
+        </span>
+      </p>
+      <button class="btn btn-success" type="submit">Register!</button>
+      <br><br>
+    </form>
+  </div>
+
+  <br><br>
+
+    {% if current_user.is_authenticated %}
+      <p>You are <span style="color:green">authenticated</span></p>
+      <ul>
+        <li><a href="/logout">Logout</a></li>
+      </ul>
+    {% else %}
+      <p>You are <span style="color:red">not authenticated</span>:</p>
+      <ul>
+        <li>Need to <a href="/">register</a>?</li>
+      </ul>
+    {% endif %}
+
+  <div class="row">
+    <div class="col-sm-9">
+      <h3>Registered Users</h3>
+      <br>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Email</th>
+            <th>Confirm Email Sent?</th>
+            <th>Confirmed?</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+            <tr>
+              <td>{{user.id}}</td>
+              <td data-user="{{user.id}}">{{user.email}}</td>
+              <td data-user="{{user.id}}" data-field="sent">{{user.email_sent}}</td>
+              <td data-user="{{user.id}}" data-field="confirm">{{user.confirmed}}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+{% endblock %}

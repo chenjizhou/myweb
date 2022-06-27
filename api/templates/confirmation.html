@@ -1,0 +1,41 @@
+{% extends '_base.html' %}
+{% from 'bootstrap/form.html' import render_form %}
+{% block content %}
+
+  <header class="content-header">
+    <h1>Confirmation email</h1>
+    <hr><br>
+  </header>
+
+  <div class="col-sm-12">
+    <h2>hello, {{ current_user.email }} </h2>
+    <form class="form-signin" role="form" method="post" action="">
+      {{ form.csrf_token }}
+      {{ form.digit_code(placeholder="digit code") }}
+        <span class="error">
+          {% if form.digit_code.errors %}
+            {% for error in form.digit_code.errors %}
+              {{ error }}
+            {% endfor %}
+          {% endif %}
+        </span>
+      </p>
+      <button class="btn btn-success" type="submit">Validate!</button>
+    </form>
+  </div>
+
+  <br><br>
+
+    {% if current_user.is_authenticated %}
+      <p>You are <span style="color:green">authenticated</span></p>
+      <ul>
+        <li><a href="/logout">Logout</a></li>
+      </ul>
+    {% else %}
+      <p>You are <span style="color:red">not authenticated</span>:</p>
+      <ul>
+        <li>Need to <a href="/">register</a>?</li>
+      </ul>
+    {% endif %}
+
+{% endblock %}

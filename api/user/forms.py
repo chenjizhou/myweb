@@ -2,21 +2,20 @@
 # api/user/forms.py
 
 
-from flask_wtf import Form
-from wtforms import PasswordField
-from wtforms.fields.html5 import EmailField
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField
 from wtforms.validators import DataRequired, Email, Length, EqualTo
 
 from api.models import User
 
 
-class LoginForm(Form):
-    email = EmailField('email', validators=[DataRequired(), Email()])
+class LoginForm(FlaskForm):
+    email = StringField('email', validators=[DataRequired(), Email()])
     password = PasswordField('password', validators=[DataRequired()])
 
 
-class RegisterForm(Form):
-    email = EmailField(
+class RegisterForm(FlaskForm):
+    email = StringField(
         'email',
         validators=[DataRequired(), Email(message=None), Length(min=6, max=255)])
     password = PasswordField(
@@ -42,8 +41,15 @@ class RegisterForm(Form):
         return True
 
 
-class ForgotForm(Form):
-    email = EmailField(
+class ConfirmForm(FlaskForm):
+    digit_code = StringField(
+        'digit_code',
+        validators=[DataRequired(), Length(min=4, max=4)]
+    )
+
+
+class ForgotForm(FlaskForm):
+    email = StringField(
         'email',
         validators=[DataRequired(), Email(message=None), Length(min=6, max=255)])
 
@@ -56,17 +62,3 @@ class ForgotForm(Form):
             self.email.errors.append("This email is not registered")
             return False
         return True
-
-
-class ChangePasswordForm(Form):
-    password = PasswordField(
-        'password',
-        validators=[DataRequired(), Length(min=6, max=255)]
-    )
-    confirm = PasswordField(
-        'Repeat password',
-        validators=[
-            DataRequired(),
-            EqualTo('password', message='Passwords must match.')
-        ]
-    )

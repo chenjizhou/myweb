@@ -2,7 +2,7 @@
 import random
 from api import redis_store, constants
 from api.response_code import RET
-from flask import current_app, jsonify
+from flask import current_app, jsonify, url_for
 from api.help.MailHelper import send_email
 
 
@@ -35,7 +35,11 @@ def confirm_token(user_id, digit_code):
         # log the error
         current_app.logger.error(e)
         return jsonify(errno=RET.DBERR, errmsg="get email digit code error")
-    if real_digit_code == digit_code:
+    if int(real_digit_code) == int(digit_code):
         return True
     else:
         return False
+
+
+def generate_url(endpoint, token):
+    return url_for(endpoint, token=token, _external=True)

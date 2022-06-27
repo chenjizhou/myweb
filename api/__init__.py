@@ -8,20 +8,31 @@ from flask import Flask
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
+from flask_bootstrap import Bootstrap
+from flask_login import LoginManager
 
-from config import config_map, logging_config_file_map
+from config import config_map, logging_config_file_map, basedir
 
+# instantiate
+# Bootstrap instant
+bootstrap = Bootstrap()
 # database instant
 db = SQLAlchemy()
 # redis instant
 redis_store = None
+# login manager
+login_manager = LoginManager()
 # get the .env config
 env = os.getenv("ENVIRONMENT") if os.getenv("ENVIRONMENT") is not None else "develop"
 
 
 # factory pattern
 def create_app():
-    app = Flask(__name__)
+    app = Flask(
+        __name__,
+        template_folder=os.path.join(basedir, 'api', 'templates'),
+        static_folder=os.path.join(basedir, 'api', 'static'),
+    )
     config_class = config_map.get(env)
     app.config.from_object(config_class)
 
@@ -30,6 +41,8 @@ def create_app():
         with open(logging_config_file, "r") as logging_yaml:
             dictConfig(yaml.safe_load(logging_yaml.read()))
 
+    # init bootstrap
+    bootstrap.init_app(app)
     # init db for app
     db.init_app(app)
     # init redis
@@ -40,9 +53,24 @@ def create_app():
     Session(app)
     # set flask CSRF protection
     CSRFProtect(app)
+    # login manager
+    login_manager.login_message_category = "danger"
+    login_manager.init_app(app)
 
     # register bleu print
     from api.user.view import user_blueprint
     app.register_blueprint(user_blueprint)
 
     return app
+
+
+####################
+#### flask-login ####
+####################
+
+from api.models import User
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.filter(User.id == int(user_id)).first()

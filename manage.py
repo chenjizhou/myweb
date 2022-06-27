@@ -1,4 +1,3 @@
-from flask_httpauth import HTTPBasicAuth
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
 
@@ -6,7 +5,6 @@ from api import create_app, db
 
 # create app
 app = create_app()
-auth = HTTPBasicAuth()
 
 manager = Manager(app)
 Migrate(app, db)
