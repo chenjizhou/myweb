@@ -1,0 +1,36 @@
+# coding:utf-8
+version: 1
+disable_existing_loggers: False
+
+root:
+  level: WARNING
+  handlers: [jl_console]
+
+formatters:
+  default:
+    format: '%(asctime)s -- %(levelname)s -- %(name)s -- %(module)s:%(funcName)s:%(lineno)d -- %(message)s'
+
+  json_formatter:
+    '()': logging_utils.JsonFormatter
+    format: '%(timestamp)s %(filename)s %(funcName)s %(levelname)s %(levelno)s %(lineno)d
+             %(module)s %(message)s %(name)s %(pathname)s %(process)d %(processName)s
+             %(thread)d %(threadName)s'
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: default
+    stream: ext://sys.stdout
+
+  jl_console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: json_formatter
+    stream: ext://sys.stdout
+
+loggers:
+  myweb:
+    level: INFO
+    handlers: [jl_console]
+    propagate: false
