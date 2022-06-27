@@ -11,7 +11,7 @@ from flask_wtf.csrf import CSRFProtect
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager
 
-from config import config_map, logging_config_file_map, basedir
+from api.server.config import config_map, logging_config_file_map, basedir
 
 # instantiate
 # Bootstrap instant
@@ -30,8 +30,8 @@ env = os.getenv("ENVIRONMENT") if os.getenv("ENVIRONMENT") is not None else "dev
 def create_app():
     app = Flask(
         __name__,
-        template_folder=os.path.join(basedir, 'api', 'templates'),
-        static_folder=os.path.join(basedir, 'api', 'static'),
+        template_folder=os.path.join(basedir, 'api', 'client/templates'),
+        static_folder=os.path.join(basedir, 'api', 'client/static'),
     )
     config_class = config_map.get(env)
     app.config.from_object(config_class)
@@ -58,17 +58,16 @@ def create_app():
     login_manager.init_app(app)
 
     # register bleu print
-    from api.user.view import user_blueprint
+    from api.server.user.view import user_blueprint
     app.register_blueprint(user_blueprint)
 
     return app
 
 
 ####################
-#### flask-login ####
+#    flask-login   #
 ####################
-
-from api.models import User
+from api.server.models import User
 
 
 @login_manager.user_loader

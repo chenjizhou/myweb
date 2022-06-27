@@ -3,7 +3,7 @@ import redis
 import os
 from os import path
 
-basedir = os.path.abspath(path.join(os.path.dirname(__file__), "."))
+basedir = os.path.abspath(path.join(os.path.dirname(__file__), "../.."))
 
 
 class Config(object):
@@ -43,6 +43,6 @@ config_map = {
 }
 
 logging_config_file_map = dict(
-        develop=os.path.join(basedir, "logging-develop.yml"),
-        production=os.path.join(basedir, "logging-production.yml"),
+        develop=os.path.join(basedir, "api", "server", "logging-develop.yml"),
+        production=os.path.join(basedir, "api", "server", "logging-production.yml"),
 )

@@ -4,21 +4,15 @@
 import datetime
 from flask import Blueprint, request, jsonify, render_template, flash, current_app, redirect, url_for
 from flask_login import login_user, logout_user, login_required, current_user
-from werkzeug.security import check_password_hash
 from sqlalchemy.exc import IntegrityError
 
-from api.models import User
+from api.server.models import User
 from api import db
-from api.response_code import RET
-from .forms import LoginForm, RegisterForm, ConfirmForm
-from api.user.utils import generate_confirmation_token_and_send_email, confirm_token
+from api.server.response_code import RET
+from .forms import RegisterForm, ConfirmForm
+from api.server.user.utils import generate_confirmation_token_and_send_email, confirm_token
 
 user_blueprint = Blueprint('user', __name__, )
-
-
-@user_blueprint.route('/hello')
-def hello():
-    return "hello world"
 
 
 @user_blueprint.route('/', methods=['GET', 'POST'])

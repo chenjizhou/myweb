@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import random
-from api import redis_store, constants
-from api.response_code import RET
+from api import redis_store
+from api.server import constants
+from api.server.response_code import RET
 from flask import current_app, jsonify, url_for
-from api.help.MailHelper import send_email
+from api.server.help.MailHelper import send_email
 
 
 def generate_confirmation_token_and_send_email(user):
@@ -18,7 +19,7 @@ def generate_confirmation_token_and_send_email(user):
         return jsonify(errno=RET.DBERR, errmsg="generate email digit code error")
     try:
         # send email_digit_code by email
-        result = send_email(user.email, email_digit_code, int(constants.EMAIL_DIGIT_CODE_REDIS_EXPIRES/60))
+        result = send_email(user.email, email_digit_code, int(constants.EMAIL_DIGIT_CODE_REDIS_EXPIRES / 60))
     except Exception as e:
         # log the error
         current_app.logger.error(e)

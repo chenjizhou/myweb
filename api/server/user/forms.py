@@ -6,7 +6,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField
 from wtforms.validators import DataRequired, Email, Length, EqualTo
 
-from api.models import User
+from api.server.models import User
 
 
 class LoginForm(FlaskForm):

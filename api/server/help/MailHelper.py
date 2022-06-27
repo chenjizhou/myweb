@@ -3,7 +3,7 @@
 # This module contains functions to send mail
 
 import smtplib
-from api import constants
+from api.server import constants
 from email.message import EmailMessage
 from flask import current_app
 
