@@ -1,4 +1,3 @@
-# use python3.8 alpine
 FROM python:3.6-slim
 
 RUN mkdir -p /myweb

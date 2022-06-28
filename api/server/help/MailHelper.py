@@ -2,10 +2,13 @@
 # @package helper.MailHelper
 # This module contains functions to send mail
 
+import os
 import smtplib
-from api.server import constants
 from email.message import EmailMessage
+
 from flask import current_app
+
+from api.server import constants
 
 
 ##
@@ -17,7 +20,7 @@ from flask import current_app
 #
 def send_email(receiver, digit_code, valid_duration):
     sender = 'me@sender.com'
-    smtp_host = constants.SMTP_HOST
+    smtp_host = os.environ.get('SMTP_HOST', '127.0.0.1')
 
     msg = EmailMessage()
     msg.set_content('Hello, your code is %s, it is valid for %s minutes'.format(digit_code, valid_duration))

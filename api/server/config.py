@@ -8,12 +8,12 @@ basedir = os.path.abspath(path.join(os.path.dirname(__file__), "../.."))
 
 class Config(object):
     # basic config
-    DEBUG = True
-    SECRET_KEY = "DQSF2ZE2ZE*EZA*7879"
+    DEBUG = False
+    TESTING = False
+    SECRET_KEY = os.environ.get("SECRET_KEY", os.urandom(24))
 
     DB_HOST = os.environ.get('DB_HOST', '127.0.0.1')
-    # database
-    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:root@"+DB_HOST+":3306/mydb"
+    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:root@" + DB_HOST + ":3306/mydb"
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 
     # redis
@@ -27,17 +27,31 @@ class Config(object):
     PERMANENT_SESSION_LIFETIME = 86400  # session life time, seconds
 
 
+# testing env
+class TestingConfig(Config):
+    CONFIG_NAME = "testing"
+    DEBUG = True
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:root@" + Config.DB_HOST + ":3306/mydb_testing"
+    WTF_CSRF_ENABLED = False
+
+
 # develop env
 class DevelopmentConfig(Config):
+    CONFIG_NAME = "development"
+    DEBUG = True
     pass
 
 
 # prod env
 class ProductionConfig(Config):
-    DEBUG = True
+    CONFIG_NAME = "production"
+    DEBUG = False
+    # todo define the production DB config here
 
 
 config_map = {
+    "testing": TestingConfig,
     "develop": DevelopmentConfig,
     "production": ProductionConfig
 }

@@ -10,18 +10,13 @@ from api.server.models import User
 
 
 class LoginForm(FlaskForm):
-    email = StringField('email', validators=[DataRequired(), Email()])
+    email = StringField('email', validators=[DataRequired(), Email(), Length(min=6, max=255)])
     password = PasswordField('password', validators=[DataRequired()])
 
 
 class RegisterForm(FlaskForm):
-    email = StringField(
-        'email',
-        validators=[DataRequired(), Email(message=None), Length(min=6, max=255)])
-    password = PasswordField(
-        'password',
-        validators=[DataRequired(), Length(min=6, max=255)]
-    )
+    email = StringField('email', validators=[DataRequired(), Email(message=None), Length(min=6, max=255)])
+    password = PasswordField('password', validators=[DataRequired(), Length(min=6, max=255)])
     confirm = PasswordField(
         'Repeat password',
         validators=[
@@ -47,18 +42,3 @@ class ConfirmForm(FlaskForm):
         validators=[DataRequired(), Length(min=4, max=4)]
     )
 
-
-class ForgotForm(FlaskForm):
-    email = StringField(
-        'email',
-        validators=[DataRequired(), Email(message=None), Length(min=6, max=255)])
-
-    def validate(self):
-        initial_validation = super(ForgotForm, self).validate()
-        if not initial_validation:
-            return False
-        user = User.query.filter_by(email=self.email.data).first()
-        if not user:
-            self.email.errors.append("This email is not registered")
-            return False
-        return True

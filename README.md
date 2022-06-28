@@ -27,3 +27,21 @@ to stop, run the stop job the same way
 migration db : 
 1. ``docker- exec -it myweb sh``
 2. ``flask db upgrade``
+
+
+
+redis :
+``docker exec -it myweb.redis sh``
+``redis-cli``
+``KEYS *``
+
+db :
+``docker exec -it myweb.mysql sh``
+``mysql -u root -p``
+enter the password 
+``mysql -u root -p``
+
+
+
+test: 
+pytest ./api/test

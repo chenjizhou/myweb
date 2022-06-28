@@ -13,16 +13,24 @@ services:
             MYSQL_DATABASE: mydb
         ports:
             - "3306:3306"
+    mail:
+        image: namshi/smtp
+        container_name: myweb.smtp
+        restart: always
+        ports:
+            - "25:25"
     myweb:
-      container_name: myweb
-      build: .
-      ports:
-        - "8088:5000"
-      environment:
-        - REDIS_HOST=myredis
-        - DB_HOST=mysql
-      volumes:
-        - .:/app
-      depends_on:
-        - myredis
-        - mysql
+        container_name: myweb
+        build: .
+        ports:
+            - "8088:5000"
+        environment:
+            - REDIS_HOST=myredis
+            - DB_HOST=mysql
+            - SMTP_HOST=mail
+        volumes:
+            - .:/app
+        depends_on:
+            - myredis
+            - mysql
+            - mail
