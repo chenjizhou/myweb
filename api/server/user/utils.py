@@ -4,10 +4,17 @@ import random
 
 from flask import current_app, jsonify, url_for
 
-from api import redis_store
+import redis
 from api.server import constants
 from api.server.help.MailHelper import send_email
 from api.server.response_code import RET
+
+# todo check why redis_store is None during test integration
+from api import redis_store, config_map
+if not redis_store:
+    env = os.getenv("ENVIRONMENT") if os.getenv("ENVIRONMENT") is not None else "develop"
+    config_class = config_map.get(env)
+    redis_store = redis.StrictRedis(host=config_class.REDIS_HOST, port=config_class.REDIS_PORT)
 
 
 def generate_confirmation_token_and_send_email(user):

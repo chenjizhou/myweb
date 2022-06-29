@@ -43,7 +43,7 @@ def test_client():
 
             yield testing_client  # this is where the testing happens!
 
-    db.drop_all()
+    #db.drop_all()
 
 
 @pytest.fixture(scope='function')

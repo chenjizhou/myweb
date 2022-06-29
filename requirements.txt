@@ -15,4 +15,4 @@ Flask-Script
 WTForms==3.0.0
 Bootstrap-Flask==1.8.0
 email-validator==1.1.1
-SQLAlchemy==1.4.39
+SQLAlchemy==1.2.15
