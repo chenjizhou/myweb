@@ -2,13 +2,12 @@
 import os
 import random
 
-import redis
 from flask import current_app, jsonify, url_for
 
+from api import redis_store
 from api.server import constants
 from api.server.help.MailHelper import send_email
 from api.server.response_code import RET
-from api.server.config import config_map
 
 
 def generate_confirmation_token_and_send_email(user):
@@ -16,13 +15,6 @@ def generate_confirmation_token_and_send_email(user):
     email_digit_code = "%04d" % random.randint(0, 9999)
     email_digit_code_prefix = os.getenv("EMAIL_DIGIT_CODE_PREFIX") if \
         os.getenv("EMAIL_DIGIT_CODE_PREFIX") is not None else "email_digit_code_"
-
-    # todo check why redis_store is None during test integration
-    from api import redis_store
-    if not redis_store:
-        env = os.getenv("ENVIRONMENT") if os.getenv("ENVIRONMENT") is not None else "develop"
-        config_class = config_map.get(env)
-        redis_store = redis.StrictRedis(host=config_class.REDIS_HOST, port=config_class.REDIS_PORT)
 
     try:
         # store the email_digit_code into redis

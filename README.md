@@ -24,6 +24,7 @@ also it will start two more services redis and mysql which is also used for the 
 to deploy on lab: create develop or tag and push, then click on deploy from gitlab ;)
 to stop, run the stop job the same way
 
+I used a orm, sorry for that, much ez for 
 migration db : 
 1. ``docker- exec -it myweb sh``
 2. ``flask db upgrade``
@@ -44,4 +45,4 @@ enter the password
 
 
 test: 
-pytest ./api/test
+``pytest ./api/test``

@@ -4,7 +4,6 @@ import os
 import pytest
 from dotenv import load_dotenv
 from sqlalchemy_utils import database_exists, create_database, drop_database
-
 from api import create_app, db
 from api.server.models import User
 
@@ -22,7 +21,6 @@ def new_user():
 
 @pytest.fixture(scope='module')
 def test_client():
-    global redis_store
     flask_app = create_app()
     if database_exists(flask_app.config["SQLALCHEMY_DATABASE_URI"]):
         drop_database(flask_app.config["SQLALCHEMY_DATABASE_URI"])
@@ -33,24 +31,17 @@ def test_client():
     with flask_app.test_client() as testing_client:
         # Establish an application context
         with flask_app.app_context():
+            # Create the database and the database table
+            db.create_all()
+
+            # Insert user data
+            user1 = User(email='hellotest@gmail.com', password='HereIsTheP@ssword')
+            user2 = User(email='hello@gmail.com', password='HereIsTheP@ssword')
+            db.session.add(user1)
+            db.session.add(user2)
+            db.session.commit()
+
             yield testing_client  # this is where the testing happens!
-
-
-@pytest.fixture(scope='module')
-def init_database(test_client):
-    # Create the database and the database table
-    db.create_all()
-
-    # Insert user data
-    user1 = User(email='hellotest@gmail.com', password='HereIsTheP@ssword')
-    user2 = User(email='hello@gmail.com', password='HereIsTheP@ssword')
-    db.session.add(user1)
-    db.session.add(user2)
-
-    # Commit the changes for the users
-    db.session.commit()
-
-    yield  # this is where the testing happens!
 
     db.drop_all()
 

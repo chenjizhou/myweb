@@ -8,6 +8,7 @@ of the `user` blueprint.
 from api.server.user.utils import generate_confirmation_token_and_send_email
 from api.server.models import User
 
+
 def test_login_page(test_client):
     """
     GIVEN a Flask application configured for testing
@@ -21,7 +22,7 @@ def test_login_page(test_client):
     assert b'Password' in response.data
 
 
-def test_valid_login_logout(test_client, init_database):
+def test_valid_login_logout(test_client):
     """
     GIVEN a Flask application configured for testing
     WHEN the '/login' page is posted to (POST)
@@ -46,7 +47,7 @@ def test_valid_login_logout(test_client, init_database):
     assert b'register' in response.data
 
 
-def test_invalid_login(test_client, init_database):
+def test_invalid_login(test_client):
     """
     GIVEN a Flask application configured for testing
     WHEN the '/login' page is posted to with invalid credentials (POST)
@@ -62,7 +63,7 @@ def test_invalid_login(test_client, init_database):
     assert b'register' in response.data
 
 
-def test_login_already_logged_in(test_client, init_database, login_default_user):
+def test_login_already_logged_in(test_client, login_default_user):
     """
     GIVEN a Flask application configured for testing
     WHEN the '/login' page is posted to (POST) when the user is already logged in
@@ -78,7 +79,7 @@ def test_login_already_logged_in(test_client, init_database, login_default_user)
     assert b'Register' not in response.data
 
 
-def test_valid_registration(test_client, init_database):
+def test_valid_registration(test_client):
     """
     GIVEN a Flask application configured for testing
     WHEN the '/register' page is posted to (POST)
@@ -109,7 +110,7 @@ def test_valid_registration(test_client, init_database):
     assert b'register' in response.data
 
 
-def test_invalid_registration(test_client, init_database):
+def test_invalid_registration(test_client):
     """
     GIVEN a Flask application configured for testing
     WHEN the '/register' page is posted to with invalid credentials (POST)
@@ -128,7 +129,7 @@ def test_invalid_registration(test_client, init_database):
     assert b'register' in response.data
 
 
-def test_duplicate_registration(test_client, init_database):
+def test_duplicate_registration(test_client):
     """
     GIVEN a Flask application configured for testing
     WHEN the '/register' page is posted to (POST) using an email address already registered
