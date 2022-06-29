@@ -1,4 +1,4 @@
-# myweb for Dailymotion Technical Test
+# myweb for Technical Test
 
 how to run:
 
@@ -10,39 +10,43 @@ ENVIRONMENT=develop
 
 this is used to deploy the app dynamically on different environment
 ex: ENVIRONMENT=production is set for prod
-
 for more, can use the IT automation application like SaltStack to deploy this file .env
  
-then run: ``docker-compose up -d --build ``
+then run under the file location: ``docker-compose up --build ``
 
-this will use code copied at docker image built, to use locally source folder
+it will start 4 container:
+webapp, mysql, redis, smtp
 
-install all the requirements and start the application
+all is already for test !
 
-also it will start two more services redis and mysql which is also used for the test
+I created **two system** 
 
-to deploy on lab: create develop or tag and push, then click on deploy from gitlab ;)
-to stop, run the stop job the same way
+one is design server-client, that's user friendly to test with an interface.
 
-I used a orm, sorry for that, much ez for 
-migration db : 
-1. ``docker- exec -it myweb sh``
-2. ``flask db upgrade``
+second one is API endpoint
 
+**to access server client :** 
+- http://127.0.0.1:8088/
 
+_after register, app will send a digit code, **you can find it in the console of docker**_ 
 
-redis :
-``docker exec -it myweb.redis sh``
-``redis-cli``
-``KEYS *``
+**to access API :** 
+- http://127.0.0.1:8088/api_v2/register
+- http://127.0.0.1:8088/api_v2/login
+- http://127.0.0.1:8088/api_v2/confirm
+- http://127.0.0.1:8088/api_v2/protected
 
-db :
-``docker exec -it myweb.mysql sh``
-``mysql -u root -p``
-enter the password 
-``mysql -u root -p``
+_register do not need token, after login you will get a token_
+use authorization : Bearer **** to call other API
 
-
-
-test: 
+test will use the .env under test directory to setup testing config: 
 ``pytest ./api/test``
+
+
+more information: 
+1. with factory config, code can deploy on different environment 
+2. create the logging format is friendly for index
+3. all included in a docker-compose.yml, easy to setup
+4. I used an orm, sorry for that, (I can remove orm if I could have few days more) 
+5. I used Bearer, not Basic Auth.
+6. I used redis to store the digit code, expired in 60 seconds

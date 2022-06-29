@@ -49,10 +49,10 @@ def confirm_token(user_id, digit_code):
         # log the error
         current_app.logger.error(e)
         return jsonify(errno=RET.DBERR, errmsg="get email digit code error")
-    if int(real_digit_code) == int(digit_code):
-        return True
-    else:
+    if not real_digit_code or int(real_digit_code) != int(digit_code):
         return False
+    else:
+        return True
 
 
 def generate_url(endpoint, token):

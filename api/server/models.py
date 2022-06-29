@@ -2,6 +2,7 @@
 from api import db
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
+import uuid
 
 
 class BaseModel(object):
@@ -16,6 +17,7 @@ class User(BaseModel, db.Model):
     __tablename__ = 'mw_user'
 
     id = db.Column(db.Integer, primary_key=True)
+    public_id = db.Column(db.String(255))
     password_hash = db.Column(db.String(128), nullable=False)
     email = db.Column(db.String(128), nullable=False)
     confirmed = db.Column(db.Boolean, nullable=False, default=False)
@@ -24,6 +26,7 @@ class User(BaseModel, db.Model):
 
     def __init__(self, email, password, confirmed=False, confirmed_on=None, email_sent=None):
         self.email = email
+        self.public_id = str(uuid.uuid4())
         self.password_hash = generate_password_hash(password)
         self.confirmed = confirmed
         self.confirmed_on = confirmed_on

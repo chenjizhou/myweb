@@ -2,6 +2,7 @@
 import redis
 import os
 from os import path
+from datetime import timedelta
 
 basedir = os.path.abspath(path.join(os.path.dirname(__file__), "../.."))
 
@@ -11,6 +12,9 @@ class Config(object):
     DEBUG = False
     TESTING = False
     SECRET_KEY = os.environ.get("SECRET_KEY", os.urandom(24))
+    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", SECRET_KEY)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=1)
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
 
     DB_HOST = os.environ.get('DB_HOST', '127.0.0.1')
     SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:root@" + DB_HOST + ":3306/mydb"

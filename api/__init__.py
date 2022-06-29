@@ -10,6 +10,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager
+from flask_jwt_extended import JWTManager
 
 from api.server.config import config_map, logging_config_file_map, basedir
 
@@ -27,6 +28,8 @@ redis_store = None
 # login manager
 login_manager = LoginManager()
 login_manager.login_view = "user.login"
+# jwt
+jwt = JWTManager()
 
 
 ######################################
@@ -71,11 +74,14 @@ def initialize_extensions(app, config_class):
     Session(app)
 
     # set flask CSRF protection
-    CSRFProtect(app)
+    #CSRFProtect(app)
 
     # login manager
     login_manager.login_message_category = "danger"
     login_manager.init_app(app)
+
+    # jwt
+    jwt.init_app(app)
 
     # Flask-Login configuration
     from api.server.models import User
@@ -90,3 +96,6 @@ def register_blueprints(app):
     # with the Flask application instance (app)
     from api.server.user.view import user_blueprint
     app.register_blueprint(user_blueprint)
+
+    from api.server.api_v2.controller import api_blueprint
+    app.register_blueprint(api_blueprint, url_prefix="/api_v2/")
