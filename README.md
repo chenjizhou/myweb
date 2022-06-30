@@ -40,6 +40,8 @@ _register do not need token, after login you will get a token_
 use authorization : Bearer **** to call other API
 
 test will use the .env under test directory to setup testing config: 
+need to install test requirements
+``pip install -r requirements-dev.txt``
 ``pytest ./api/test``
 
 
